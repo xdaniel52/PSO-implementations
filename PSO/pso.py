@@ -38,7 +38,6 @@ class PSO:
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
         self.global_best_value = self.particles[0].value.copy()
-        print(self.global_best_value)
         for i in range(pop_size):
             if(self.particles[i].value < self.global_best_value):
                 self.global_best_position = self.particles[i].position.copy()
@@ -80,7 +79,7 @@ class PSO:
                     
     def Update_particle_velicity(self, particle):
         for dim in range(num_var):
-                particle.velocity[dim] = w * particle.velocity[dim] \
+                particle.velocity[dim] = self.w * particle.velocity[dim] \
                     + self.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
         
