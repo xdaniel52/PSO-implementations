@@ -24,11 +24,11 @@ class PSO:
         
     def Init_particles(self):
         self.particles = []
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             position = []
             velocity = []
-            for dim in range(num_var):
-                position.append(np.random.random()*(range_of_params[dim][1]-range_of_params[dim][0]) + range_of_params[dim][0]) 
+            for dim in range(self.num_var):
+                position.append(np.random.random()*(self.range_of_params[dim][1]-self.range_of_params[dim][0]) + self.range_of_params[dim][0]) 
                 velocity.append(0.1 * position[dim]) 
             value = self.function(position)
             self.particles.append(Particle(position, value, velocity))
@@ -38,12 +38,12 @@ class PSO:
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
         self.global_best_value = self.particles[0].value.copy()
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             if(self.particles[i].value < self.global_best_value):
                 self.global_best_position = self.particles[i].position.copy()
                 self.global_best_value = self.particles[i].value.copy() 
                
-        for e in range(epochs):    
+        for e in range(self.epochs):    
             self.Update_particles_velicity()
             self.Update_particles_position()
                        
@@ -57,17 +57,17 @@ class PSO:
     
 
     def Update_particles_position(self):
-        for i in range(pop_size):
+        for i in rangeself.(pop_size):
             self.Update_particle_position(self.particles[i])
             self.Update_particle_value(self.particles[i])
             self.Update_particles_best_and_global_best_position(self.particles[i])
     
     def Update_particles_velicity(self):
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             self.Update_particle_velicity(self.particles[i])
         
     def Update_particle_position(self, particle):
-        for dim in range(num_var):
+        for dim in range(self.num_var):
             particle.position[dim] += particle.velocity[dim]
             if(particle.position[dim] < self.range_of_params[dim][0]):
                 particle.position[dim] = self.range_of_params[dim][0] * 0.9
@@ -78,7 +78,7 @@ class PSO:
         particle.value = self.function(particle.position)
                     
     def Update_particle_velicity(self, particle):
-        for dim in range(num_var):
+        for dim in range(self.num_var):
                 particle.velocity[dim] = self.w * particle.velocity[dim] \
                     + self.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
