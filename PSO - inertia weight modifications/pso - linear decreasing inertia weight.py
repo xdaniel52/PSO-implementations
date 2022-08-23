@@ -39,11 +39,11 @@ class PSO:
         self.function = function
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
-        self.global_best_value = self.particles[0].value.copy()
-        for i in range(pop_size):
+        self.global_best_value = self.particles[0].value
+        for i in range(self.pop_size):
             if(self.particles[i].value < self.global_best_value):
                 self.global_best_position = self.particles[i].position.copy()
-                self.global_best_value = self.particles[i].value.copy() 
+                self.global_best_value = self.particles[i].value 
                
         for epoch in range(self.epochs):  
             self.Update_inertia_weight(epoch)

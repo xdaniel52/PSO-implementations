@@ -57,7 +57,7 @@ class PSO:
     
 
     def Update_particles_position(self):
-        for i in rangeself.(pop_size):
+        for i in range(self.pop_size):
             self.Update_particle_position(self.particles[i])
             self.Update_particle_value(self.particles[i])
             self.Update_particles_best_and_global_best_position(self.particles[i])

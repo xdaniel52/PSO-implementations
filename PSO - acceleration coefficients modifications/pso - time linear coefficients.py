@@ -28,11 +28,11 @@ class PSO:
         
     def Init_particles(self):
         self.particles = []
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             position = []
             velocity = []
             for dim in range(num_var):
-                position.append(np.random.random()*(range_of_params[dim][1]-self.range_of_params[dim][0]) + self.range_of_params[dim][0]) 
+                position.append(np.random.random()*(self.range_of_params[dim][1]-self.range_of_params[dim][0]) + self.range_of_params[dim][0]) 
                 velocity.append(0.1 * position[dim]) 
             value = self.function(position)
             self.particles.append(Particle(position, value, velocity))
@@ -42,7 +42,7 @@ class PSO:
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
         self.global_best_value = self.particles[0].value.copy()
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             if(self.particles[i].value < self.global_best_value):
                 self.global_best_position = self.particles[i].position.copy()
                 self.global_best_value = self.particles[i].value.copy() 

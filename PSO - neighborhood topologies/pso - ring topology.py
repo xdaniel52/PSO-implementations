@@ -121,7 +121,7 @@ w = 0.8
 c1 = 0.8
 c2 = 0.6
 neighborhood_size = 3
-epochs = 500 
+epochs = 100 
 range_of_params = [(-10,10)]*num_var
 
 pso = PSO(num_var,pop_size,w,c1,c2,neighborhood_size,epochs,range_of_params)
