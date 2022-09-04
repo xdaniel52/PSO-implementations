@@ -41,7 +41,7 @@ class PSO:
                 position.append(np.random.random()*(self.range_of_params[dim][1]-self.range_of_params[dim][0]) + self.range_of_params[dim][0]) 
                 velocity.append(0.1 * position[dim]) 
             value = self.function(position)
-            self.particles.append(Particle(position, value, velocity, num_var))
+            self.particles.append(Particle(position, value, velocity, self.num_var))
     
     def Start(self, function):
         self.function = function
