@@ -36,7 +36,7 @@
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
 - topology - Dynamic
-- using personal using other particles or self best position and local best position
+- using personal using other particles or self best position and global best position
 - the initiated velocity is based on the initiated position
  
 ### Research papers:
