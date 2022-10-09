@@ -115,13 +115,13 @@ class PSO:
     def Refresh_learining_vector(self, idx): 
         for dim in range(self.num_var):
             if np.random.random() <= self.pc:
-                one = np.random.randint(0,self.num_var)
+                one = np.random.randint(0,self.pop_size)
                 while one == idx:
-                    one = np.random.randint(0,self.num_var)
+                    one = np.random.randint(0,self.pop_size)
                     
-                two = np.random.randint(0,self.num_var)
+                two = np.random.randint(0,self.pop_size)
                 while two == idx:
-                    two = np.random.randint(0,self.num_var)
+                    two = np.random.randint(0,self.pop_size)
                     
                 if self.particles[one].best_value < self.particles[two].best_value:
                     self.particles[idx].learining_vector[dim] = one
