@@ -1,7 +1,7 @@
 import numpy as np
 
 class Particle:
-     def __init__(self, position, value, velocity):
+    def __init__(self, position: list, value : float, velocity: list):
         self.position = position
         self.value = value
         self.velocity = velocity
@@ -10,7 +10,7 @@ class Particle:
 
 
 class PSO:
-    def __init__(self, num_var, pop_size, w_min, w_max, c1, c2, epochs, range_of_params):
+    def __init__(self, num_var: int, pop_size: int, w_min: float, w_max: float, c1: float, c2: float, epochs: int):
         self.num_var = num_var
         self.pop_size = pop_size
         self.w_min = w_min
@@ -19,24 +19,24 @@ class PSO:
         self.c1 = c1
         self.c2 = c2
         self.epochs = epochs
-        self.range_of_params = range_of_params
         self.global_best_position = 0
         self.global_best_value = 0
         self.particles = []
         
-    def Init_particles(self):
+    def Init_particles(self) -> None:
         self.particles = []
         for i in range(self.pop_size):
             position = []
             velocity = []
-            for dim in rangeself.num_var):
+            for dim in range(self.num_var):
                 position.append(np.random.random()*(self.range_of_params[dim][1]-self.range_of_params[dim][0]) + self.range_of_params[dim][0]) 
                 velocity.append(0.1 * position[dim]) 
             value = self.function(position)
             self.particles.append(Particle(position, value, velocity))
     
-    def Start(self, function):
+    def Start(self, function: function, range_of_params: list) -> None:
         self.function = function
+        self.range_of_params = range_of_params
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
         self.global_best_value = self.particles[0].value
@@ -49,15 +49,10 @@ class PSO:
             self.Update_inertia_weight(epoch)
             self.Update_particles_velicity()
             self.Update_particles_position()
-                       
-        self.Print_result()
     
-    def Print_result(self):
-        print("best pisition found: ")
-        print(self.global_best_position)
-        print("minimum value :")
-        print(self.global_best_value)
-    
+    def Print_result(self) -> None:
+        print(f"best pisition found: {self.global_best_position}")
+        print(f"minimum value : {self.global_best_value}")
 
     def Update_particles_position(self):
         for i in range(self.pop_size):
@@ -73,9 +68,9 @@ class PSO:
         for dim in range(self.num_var):
             particle.position[dim] += particle.velocity[dim]
             if(particle.position[dim] < self.range_of_params[dim][0]):
-                particle.position[dim] = self.range_of_params[dim][0] * 0.9
+                particle.position[dim] = self.range_of_params[dim][0]
             elif(particle.position[dim] > self.range_of_params[dim][1]):
-                particle.position[dim] = self.range_of_params[dim][1] * 0.9
+                particle.position[dim] = self.range_of_params[dim][1]
     
     def Update_particle_value(self, particle):
         particle.value = self.function(particle.position)
@@ -97,7 +92,7 @@ class PSO:
     def Update_inertia_weight(self, epoch):
         self.w = self.w_min + (self.w_max-self.w_min)*(self.epochs - epoch)/self.epochs
 
-def test_funcion(x):
+def test_funcion(x: list) -> float:
     return   10*np.power(x[0]-1.,2)\
             +20*np.power(x[1]-2.,2)\
             +30*np.power(x[2]-3.,2)\
@@ -105,17 +100,21 @@ def test_funcion(x):
             +50*np.power(x[4]-5.,2)\
             +60*np.power(x[5]-6.,2)\
 
-num_var = 6
-pop_size = 10
-w_min = 0.4
-w_max = 0.9
-c1 = 0.8
-c2 = 0.6
-epochs = 100 
-range_of_params = [(-10,10)]*num_var
-
-pso = PSO(num_var,pop_size,w_min,w_max,c1,c2,epochs,range_of_params)
-pso.Start(test_funcion);
 
 
+def main():
+    num_var = 6
+    pop_size = 10
+    w_min = 0.4
+    w_max = 0.9
+    c1 = 0.8
+    c2 = 0.6
+    epochs = 100 
+    range_of_params = [(-10,10)]*num_var
 
+    pso = PSO(num_var,pop_size,w_min,w_max,c1,c2,epochs)
+    pso.Start(test_funcion, range_of_params)
+    pso.Print_result()
+    
+if __name__ == "__main__":
+    main()
