@@ -37,11 +37,11 @@ class PSO:
         self.function = function
         self.Init_particles()
         self.global_best_position = self.particles[0].position.copy()
-        self.global_best_value = self.particles[0].value.copy()
+        self.global_best_value = self.particles[0].value
         for i in range(self.pop_size):
             if(self.particles[i].value < self.global_best_value):
                 self.global_best_position = self.particles[i].position.copy()
-                self.global_best_value = self.particles[i].value.copy() 
+                self.global_best_value = self.particles[i].value
                
         for e in range(self.epochs):    
             self.Update_particles_velicity()
@@ -86,10 +86,12 @@ class PSO:
     def Update_particles_best_and_global_best_position(self, particle):
         if(particle.value < particle.best_value):
             particle.best_position = particle.position.copy()
-            particle.best_value = particle.value.copy()
+            particle.best_value = particle.value
             if(particle.value < self.global_best_value):
                 self.global_best_position = particle.position.copy()
-                self.global_best_value = particle.value.copy()
+                self.global_best_value = particle.value
+    def GetOptimum(self):
+        return self.global_best_value
 
 
 def test_funcion(x):

@@ -32,6 +32,22 @@ class PSO:
         self.global_best_position = 0
         self.global_best_value = 0
         
+    def Init_particles_from_file(self):
+        self.particles_positions = []
+        im = ImportParticles(self.pop_size,self.num_var,self.range_of_params[0])
+        im.Import(self.particles_positions)
+        
+        
+        for i in range(self.pop_size):
+            position = self.particles_positions[i]
+            
+            velocity = []
+            for dim in range(self.num_var): 
+                velocity.append(0.1 * position[dim]) 
+            value = self.function(position)
+            self.particles.append(Particle(position, value, velocity, self.num_var))
+
+
     def Init_particles(self):
         self.particles = []
         for i in range(self.pop_size):
@@ -45,7 +61,8 @@ class PSO:
     
     def Start(self, function):
         self.function = function
-        self.Init_particles()
+        #self.Init_particles()
+        self.Init_particles_from_file()
         self.global_best_position = self.particles[0].position.copy()
         self.global_best_value = self.particles[0].value
         for i in range(self.pop_size):
@@ -59,7 +76,6 @@ class PSO:
             self.Update_particles_velicity()
             self.Regrouping()
                        
-        self.Print_result()
     
     def Print_result(self):
         global_best_position, global_best_value = self.Find_best()
@@ -107,7 +123,7 @@ class PSO:
             particle.refreshing_counter = 0
             if(particle.value < self.global_best_value):
                 self.global_best_position = particle.position.copy()
-                self.global_best_value = particle.value.copy()
+                self.global_best_value = particle.value
         else:
             particle.refreshing_counter += 1
                  
@@ -153,6 +169,10 @@ class PSO:
                 best_idx = i
                 
         return (self.particles[best_idx].best_position,self.particles[best_idx].best_value)
+            
+
+    def GetOptimum(self):
+        return self.Find_best()[1]
     
                      
 

@@ -27,6 +27,21 @@ class PSO:
         self.range_of_params = range_of_params
         self.particles = []
         
+    def Init_particles_from_file(self):
+        self.particles_positions = []
+        im = ImportParticles(self.pop_size,self.num_var,self.range_of_params[0])
+        im.Import(self.particles_positions)
+        
+        
+        for i in range(self.pop_size):
+            position = self.particles_positions[i]
+            
+            velocity = []
+            for dim in range(self.num_var): 
+                velocity.append(0.1 * position[dim]) 
+            value = self.function(position)
+            self.particles.append(Particle(position, value, velocity, self.num_var))
+            
     def Init_particles(self):
         self.particles = []
         for i in range(self.pop_size):
@@ -40,14 +55,13 @@ class PSO:
     
     def Start(self, function):
         self.function = function
-        self.Init_particles()
-               
+        #self.Init_particles()
+        self.Init_particles_from_file()
+        
         for e in range(self.epochs):
             self.Update_inertia_weight(e)
             self.Update_particles_position()
             self.Update_particles_velicity()       
-                       
-        self.Print_result()
     
     def Print_result(self):
         global_best_position, global_best_value = self.Find_best()
@@ -125,6 +139,9 @@ class PSO:
                 best_idx = i
                 
         return (self.particles[best_idx].best_position,self.particles[best_idx].best_value)
+    
+    def GetOptimum(self):
+        return self.Find_best()[1]
                      
 
 def test_funcion(x):

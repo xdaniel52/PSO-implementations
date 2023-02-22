@@ -1,4 +1,6 @@
 import numpy as np
+from cec2017.functions import all_functions as cec2017_Functions
+from cec2017.basic import all_functions as cec2017_Functions2
 
 class Particle:
      def __init__(self, position, value, velocity):
@@ -23,6 +25,21 @@ class PSO:
         self.range_of_params = range_of_params
         self.particles = []
         
+    def Init_particles_from_file(self):
+        self.particles_positions = []
+        im = ImportParticles(self.pop_size,self.num_var,self.range_of_params[0])
+        im.Import(self.particles_positions)
+        
+        
+        for i in range(self.pop_size):
+            position = self.particles_positions[i]
+            
+            velocity = []
+            for dim in range(self.num_var): 
+                velocity.append(0.1 * position[dim]) 
+            value = self.function(position)
+            self.particles.append(Particle(position, value, velocity, self.num_var))
+            
     def Init_particles(self):
         self.particles = []
         for i in range(self.pop_size):
@@ -36,13 +53,13 @@ class PSO:
     
     def Start(self, function):
         self.function = function
-        self.Init_particles()
+        #self.Init_particles()
+        self.Init_particles_from_file()
                
         for e in range(self.epochs):
             self.Update_particles_position()
             self.Update_particles_velicity()       
-                       
-        self.Print_result()
+
     
     def Print_result(self):
         global_best_position, global_best_value = self.Find_best()
@@ -105,6 +122,9 @@ class PSO:
                 best_idx = i
                 
         return (self.particles[best_idx].best_position,self.particles[best_idx].best_value)
+    
+    def GetOptimum(self):
+        return self.Find_best()[1]
                      
 
 def test_funcion(x):
@@ -115,16 +135,16 @@ def test_funcion(x):
             +50*np.power(x[4]-5.,2)\
             +60*np.power(x[5]-6.,2)\
 
-num_var = 6
-pop_size = 10
+num_var = 30
+pop_size = 30
 w = 0.8
 c1 = 0.8
 c2 = 0.6
 neighborhood_size = 3
-epochs = 100 
-range_of_params = [(-10,10)]*num_var
+epochs = 3000 
+range_of_params = [(-100,100)]*num_var
 
 pso = PSO(num_var,pop_size,w,c1,c2,neighborhood_size,epochs,range_of_params)
-pso.Start(test_funcion);
+pso.Start(cec2017_Functions2[1]);
 
 
