@@ -33,7 +33,7 @@ class PSO:
             value = self.function(position)
             self.particles.append(Particle(position, value, velocity))
     
-    def Start(self, function: function, range_of_params: list) -> None:
+    def Start(self, function, range_of_params: list) -> None:
         self.function = function
         self.range_of_params = range_of_params
         self.Init_particles()
