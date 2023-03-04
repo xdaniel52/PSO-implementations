@@ -6,21 +6,21 @@ from test_functions import *
 
 class TestPSOVariants:
     
-    def __init__(self, PSO_list: list, functions_list: list, range_of_params_list: list,num_of_repetitions: int):
+    def __init__(self, PSO_list: list, functions_list: list, range_of_params_list: list,num_of_repetitions: int) -> None:
         self.PSO_list = PSO_list
         self.functions_list = functions_list
         self.range_of_params_list = range_of_params_list
         self.num_of_repetitions = num_of_repetitions
         self.each_result =[[[0 for i in range(num_of_repetitions)] for j in functions_list] for k in range(len(PSO_list))]
 
-    def Run(self, verbose: bool = False):
+    def Run(self, verbose: bool = False) -> None:
         for pso_id in range(len(self.PSO_list)):            
             for fun_id in range(len(self.functions_list)):               
                 for test_id in range(self.num_of_repetitions):
                     self.PSO_list[pso_id].Start(self.functions_list[fun_id], [self.range_of_params_list[fun_id] for _ in range(self.PSO_list[pso_id].num_var)])
                     self.each_result[pso_id][fun_id][test_id] = self.PSO_list[pso_id].GetOptimum()
                     
-    def PrintReslt(self):
+    def PrintReslt(self) -> None:
         print(f"Raport for:")
         print(f"PSO_list: {[pso.__class__.__name__ for pso in self.PSO_list]}")
         print(f"functions_list: {[fun.__name__ for fun in self.functions_list]}")
@@ -39,7 +39,7 @@ class TestPSOVariants:
                 print(f"\t\tAvg: {avg}\tMedian: {median}\tStd: {std}\t{maks}Maks: \tMin: {mini}".replace('.',','))
             print()
                                     
-    def PrintDetailedResult(self):
+    def PrintDetailedResult(self) -> None:
         print(f"Raport for:")
         print(f"PSO_list: {[pso.__class__.__name__ for pso in self.PSO_list]}")
         print(f"functions_list: {[fun.__name__ for fun in self.functions_list]}")

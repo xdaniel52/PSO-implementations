@@ -1,27 +1,27 @@
 import xml.etree.ElementTree as gfg
 import sys
 sys.path.append('.')    
-from PSO_authorial_variants.Social_Classes_PSO import PSO 
+from PSO_authorial_variants.social_classes_pso import PSO 
 from test_functions import * 
 
 class ParamTuner:
     
-    def __init__(self, pso_class, functions_list: list, num_of_tests: int, params_sets_list: list,range_of_params: list):
+    def __init__(self, pso_class, functions_list: list, num_of_repetitions: int, params_sets_list: list,range_of_params: list) -> None:
         self.pso_class = pso_class
         self.functions_list = functions_list
-        self.num_of_tests = num_of_tests
+        self.num_of_tests = num_of_repetitions
         self.params_sets_list = params_sets_list
         self.range_of_params = range_of_params
         lens = [len(par_set)for par_set in self.params_sets_list]
         self.try_count = 1
         for l in lens:
             self.try_count *=l
-        self.each_result = [[[0 for i in range(num_of_tests)] for j in functions_list] for k in range(self.try_count)]
+        self.each_result = [[[0 for i in range(num_of_repetitions)] for j in functions_list] for k in range(self.try_count)]
         self.ParamsGenerator = self.CreateGenerator()
         self.CalculateNoSteps()
 
     def Tune(self, verbose_level: int = 1, export: bool = False, file_Name: str = "result", 
-             plot_gbest = False,plot_velocity = False ):
+             plot_gbest = False,plot_velocity = False ) -> None:
         
         if export:
             root = gfg.Element('ROOT')   
@@ -75,7 +75,7 @@ class ParamTuner:
             yield(current_set.copy())      
             current_set_ids[0]+=1           
             
-    def GetGeneratorValue(self, number: int):
+    def GetGeneratorValue(self, number: int) -> list:
         lens = [len(par_set)for par_set in self.params_sets_list]
         current_set_ids = [0 for par_set in self.params_sets_list]
         current_set = [par_set[0] for par_set in self.params_sets_list]
@@ -96,7 +96,7 @@ class ParamTuner:
         return current_set.copy()
             
     
-    def PrintReslt1(self):
+    def PrintReslt1(self) -> None:
         print(f"functions_list: {self.functions_list}")
         print(f"num_of_tests: {self.num_of_tests}")
         print("Results: ")
@@ -110,7 +110,7 @@ class ParamTuner:
                     
             set_num+=1
                                
-    def PrintReslt2(self, num_of_best: int = 2):
+    def PrintReslt2(self, num_of_best: int = 2) -> None:
         if num_of_best > self.try_count:
             num_of_best = self.try_count
         print("Results: ")   
@@ -129,14 +129,14 @@ class ParamTuner:
                 print(f"     best: {i+1} value: {tmp_tab[i][1]}" )
                 print(f"     params: {self.GetGeneratorValue(tmp_tab[i][0])}")
       
-    def CalculateNoSteps(self):
+    def CalculateNoSteps(self) -> None:
         steps_number = self.num_of_tests * len(self.functions_list)
         for params_set in self.params_sets_list:
             steps_number*=len(params_set)      
         self.steps_number = steps_number
             
  
-def CreateSets(params_sets_list: list):
+def CreateSets(params_sets_list: list) -> list:
         '''Return all combination of given params lists '''
         result = []
         lens = [len(par_set)for par_set in params_sets_list]
@@ -159,14 +159,14 @@ def CreateSets(params_sets_list: list):
             
         return result
             
-def main():
+def main() -> None:
 
     functions = [f_1 , f_2 , f_3 , f_4 , f_5 , f_6 , f_7 , f_8 , f_9]
     range_of_params = [(-100,100),(-10,10),(-10,10),(-10,10),(-100,100),(-1.28,1.28),(-500,500),(-5.12,5.12),(-5.12,5.12) ]
 
     functions = functions[:2]
     range_of_params = range_of_params[:2]
-    num_of_tests = 3
+    num_of_repetitions = 3
     assert len(functions) == len(range_of_params)
 
     #uppper
@@ -206,7 +206,7 @@ def main():
                 num_var_set,epochs_set]
     
     #run tuner
-    tuner = ParamTuner(PSO, functions, num_of_tests ,params_sets,range_of_params)
+    tuner = ParamTuner(PSO, functions, num_of_repetitions ,params_sets,range_of_params)
     tuner.Tune(verbose_level = 1,export=False,plot_gbest=(False),plot_velocity=(False))
     tuner.PrintReslt2(num_of_best=3)
 

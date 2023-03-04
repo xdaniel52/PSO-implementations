@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as gfg 
 import sys
 sys.path.append('.')    
-from PSO_authorial_variants.Social_Classes_PSO import PSO as PSOparent
+from PSO_authorial_variants.social_classes_pso import PSO as PSOparent
 from test_functions import * 
 
 class PSO(PSOparent):
@@ -9,7 +9,7 @@ class PSO(PSOparent):
                  middle_pop_size, middle_w, middle_c1, middle_c2,\
                  lower_pop_size, lower_w, lower_c1, lower_c2, lower_neighborhood_size,\
                  generation_change, num_var,epochs,
-                 ):
+                 ) -> None:
         
         upper_params = (upper_pop_size,upper_w,upper_c1,upper_c2)
         middle_params = (middle_pop_size,middle_w,middle_c1,middle_c2)
@@ -19,20 +19,20 @@ class PSO(PSOparent):
          
 class TunerPSO:
     """Searching for best params for inner PSO using outer PSO"""   
-    def __init__(self, outer_pso_class, outer_params: list, inner_pso_class, pso_range_of_params: list, test_num: int):
+    def __init__(self, outer_pso_class, outer_params: list, inner_pso_class, pso_range_of_params: list, num_of_repetitions: int) -> None:
         self.PSO = outer_pso_class(*outer_params)
         self.inner_pso_class = inner_pso_class
         self.pso_range_of_params = pso_range_of_params
-        self.test_num = test_num 
+        self.test_num = num_of_repetitions 
         self.history_params = []
         self.history_best = []
         
-    def Tune(self, fun, range_of_params: list):
+    def Tune(self, fun, range_of_params: list) -> None:
         new_fun = self.Create_New_Function(fun, range_of_params,self.pso_range_of_params)
         self.PSO.Start(new_fun,self.pso_range_of_params,False,True)
         self.PSO.Print_result()
     
-    def Create_New_Function(self, fun, range_of_params: list,pso_range_of_params: list,):
+    def Create_New_Function(self, fun, range_of_params: list,pso_range_of_params: list):
         def New_Fun(*args):
             for i in range(len(args[0])):
                 if i in [0, 4, 8, 12, 13, 14, 15, 16, 19]:  # 1.0 precision params
@@ -80,13 +80,13 @@ class TunerPSO:
             
         return New_Fun
         
-    def AddElementToTree(self, parent: gfg.Element, elem_name: str, text: str):
+    def AddElementToTree(self, parent: gfg.Element, elem_name: str, text: str) -> None:
         elementXML = gfg.Element(elem_name) 
         parent.append(elementXML)
         elementXML.text = str(text)
         
     
-    def Create_XML_Tree(self, fun_Name: str, params: list,global_best: float):
+    def Create_XML_Tree(self, fun_Name: str, params: list,global_best: float) -> None:
         testXML = gfg.Element('TEST') 
         
         self.AddElementToTree(parent = testXML,elem_name = 'PSO_NAME',text = "Social Classes PSO")
@@ -122,7 +122,7 @@ class TunerPSO:
         
         return testXML
    
-    def ExportResultToXML(self, file_Name: str, fun_Name: str):
+    def ExportResultToXML(self, file_Name: str, fun_Name: str) -> None:
         root = gfg.Element('ROOT')
         testsXML = gfg.Element('TESTS')
         root.append(testsXML)
@@ -152,12 +152,12 @@ def main() -> None:
                     20,0.5,1.2,1.0,5,
                     4,
                     20,
-                    1,
+                    10,
                     5,10,0.1,0.30  ]
 
     # 0 4 8 12 13 14 15 16 17 ids of static params, not for optimization
 
-    test_num = 1
+    num_of_repetitions = 1
 
     #define search space for params 
     range_upper_pop_size = ( 5, 5)
@@ -175,7 +175,7 @@ def main() -> None:
     range_lower_neighborhood_size = ( 5, 5)
     range_generation_change = ( 0, 10)
     range_num_var = ( 2, 2)
-    range_epochs = ( 1, 1)
+    range_epochs = ( 100, 100)
     range_sigma_top_par = ( 10, 1000)
     range_sigma_bot_par = ( 100, 1000000)
     range_prob_base = ( 0, 5)
@@ -189,7 +189,7 @@ def main() -> None:
                         ]
 
     #run tuner
-    tuner = TunerPSO(PSO, outer_params, PSO, pso_range_of_params, test_num)
+    tuner = TunerPSO(PSO, outer_params, PSO, pso_range_of_params, num_of_repetitions)
     tuner.Tune(functions[1],[range_of_params[1] for i in range(range_num_var[1])])
     tuner.ExportResultToXML("test_result_1234 ","modified_schwefel")
     
