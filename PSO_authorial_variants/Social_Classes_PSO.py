@@ -1,51 +1,41 @@
-
 import numpy as np
 import math
 import xml.etree.ElementTree as gfg 
 from matplotlib import pyplot as plt
-from cec2017.functions import all_functions as cec2017_Functions
-from cec2017.basic import all_functions as cec2017_Functions2
+import sys
+sys.path.append('.')  
+from Test_templates.test_functions import *
 
 class Particle:
-     def __init__(self, position, value, velocity, num_var):
+     def __init__(self, position, value, velocity):
         self.position = position
         self.value = value
         self.velocity = velocity
         self.best_position = position
-        self.best_value = value
-        self.learining_vector = [ 0 for i in range(num_var)]
-        self.refreshing_counter = 100       
+        self.best_value = value    
     
-class EmptyClass:
-    pass
+class UpperMiddleClass:
+    def __init__(self,params) -> None:
+        self.pop_size = params[0]
+        self.w = params[1]
+        self.c1 = params[2]
+        self.c2 = params[3]
+        self.particles = []
+class LowerClass(UpperMiddleClass):
+    def __init__(self,params) -> None:
+        super().__init__(params[:4])
+        self.neighborhood_size = params[4]
+        self.lbest_value = 0
+        self.lbest_position = 0
+        self.particles = []
 
 class PSO:
-    def __init__(self,upper_params,middle_params,lower_params,generation_change,num_var,epochs,convergence_generation_params = [] ):
-        self.upper = EmptyClass()
-        self.upper.pop_size = upper_params[0]
-        self.upper.w = upper_params[1]
-        self.upper.c1 = upper_params[2]
-        self.upper.c2 = upper_params[3]
-        self.upper.particles = []
-        
-        self.middle = EmptyClass()
-        self.middle.pop_size = middle_params[0]
-        self.middle.w = middle_params[1]
-        self.middle.c1 = middle_params[2]
-        
-        self.middle.c2 = middle_params[3]
-        self.middle.refreshing_gap = middle_params[4]
-        self.middle.particles = []
+    def __init__(self,upper_params: list,middle_params: list,lower_params: list,generation_change: int
+                 ,num_var: int,epochs: int,convergence_generation_params: list = [] ) -> None:
 
-        self.lower = EmptyClass()
-        self.lower.pop_size = lower_params[0]
-        self.lower.w = lower_params[1]
-        self.lower.c1 = lower_params[2]
-        self.lower.c2 = lower_params[3]
-        self.lower.neighborhood_size = lower_params[4]
-        self.lower.lbest_value = 0
-        self.lower.lbest_position = 0
-        self.lower.particles = []
+        self.upper = UpperMiddleClass(upper_params)
+        self.middle = UpperMiddleClass(middle_params)
+        self.lower = LowerClass(lower_params)
         
         self.global_best_position = 0
         self.global_best_value = 0
@@ -66,12 +56,12 @@ class PSO:
             self.c_gen_c2 = convergence_generation_params[3] 
           
         
-    def Init_particles(self):
+    def Init_particles(self) -> None:
         self.Init_group(self.upper.particles,self.upper.pop_size)
         self.Init_group(self.middle.particles,self.middle.pop_size)
         self.Init_group(self.lower.particles,self.lower.pop_size)
             
-    def Init_group(self,particles,size):
+    def Init_group(self,particles: list,size: int) -> None:
         particles[:] = []
         for i in range(size):
             position = []
@@ -83,7 +73,7 @@ class PSO:
             value = self.function(position)
             particles.append(Particle(position, value, velocity, self.num_var))
     
-    def Start(self, function, range_of_params, plot_gbest = False, plot_velocity = False):
+    def Start(self, function, range_of_params: list, plot_gbest: bool = False, plot_velocity: bool  = False) -> None:
         self.function = function
         self.range_of_params = range_of_params
         self.velocity_bot_limit = range_of_params[0][0]/10
@@ -110,7 +100,7 @@ class PSO:
         self.Plots_plot(plot_gbest,plot_velocity)              
         #self.Print_result()
     
-    def Find_starting_global_best(self):
+    def Find_starting_global_best(self) -> None:
         self.global_best_position = self.upper.particles[0].position.copy()
         self.global_best_value = self.upper.particles[0].value
         for i in range(self.upper.pop_size):
@@ -126,7 +116,7 @@ class PSO:
                 self.global_best_position = self.lower.particles[i].position.copy()
                 self.global_best_value = self.lower.particles[i].value    
         
-    def Update_classes(self):
+    def Update_classes(self) -> None:
         self.lower.particles.sort(key=lambda p: p.value)
         tmp_list = self.upper.particles + self.middle.particles+self.lower.particles[:self.lower.pop_size]
         tmp_list.sort(key=lambda p: p.value)
@@ -135,28 +125,25 @@ class PSO:
         self.lower.particles = tmp_list[self.upper.pop_size+self.middle.pop_size:]
         for mid in self.middle.particles:
             mid.refreshing_counter = 0
-        #print("Classes updated")
         
             
-    def Print_result(self):
-        print("best position found: ")
-        print(self.global_best_position)
-        print("minimum value :")
-        print(self.global_best_value)
+    def Print_result(self) -> None:
+        print(f"best pisition found: {self.global_best_position}")
+        print(f"minimum value : {self.global_best_value}")
     
 
-    def Update_particles_position(self):
+    def Update_particles_position(self) -> None:
         self.Update_particles_position_in_group(self.upper)
         self.Update_particles_position_in_group(self.middle)
         self.Update_particles_position_in_group(self.lower)
     
-    def Update_particles_position_in_group(self, group):
+    def Update_particles_position_in_group(self, group: LowerClass) -> None:
         for i in range(group.pop_size):        
             self.Update_particle_position(group.particles[i])       
             self.Update_particle_value(group.particles[i])
             self.Update_particle_best_and_global_best_position(group.particles[i])
             
-    def Update_particle_position(self, particle):
+    def Update_particle_position(self, particle: Particle) -> None:
         for dim in range(self.num_var):
             particle.position[dim] += particle.velocity[dim]
             if(particle.position[dim] < self.range_of_params[dim][0]):
@@ -164,60 +151,50 @@ class PSO:
             elif(particle.position[dim] > self.range_of_params[dim][1]):
                 particle.position[dim] = self.range_of_params[dim][1] * 0.9
     
-    def Update_particle_value(self, particle):
+    def Update_particle_value(self, particle: Particle) -> None:
         particle.value = self.function(particle.position) 
         
-    def Update_particles_velicity(self):
+    def Update_particles_velicity(self) -> None:
         self.Update_upper_particles_velicity()
         self.Update_middle_particles_velicity()
         self.Update_lower_particles_velicity()
             
-    def Update_upper_particles_velicity(self):
+    def Update_upper_particles_velicity(self) -> None:
         for i in range(self.upper.pop_size):           
             self.Update_upper_particle_velicity(self.upper.particles[i])
             self.CheckVelocityLimits(self.upper.particles[i])
     
-    def Update_middle_particles_velicity(self):
+    def Update_middle_particles_velicity(self) -> None:
         for i in range(self.middle.pop_size):
-            if self.middle.particles[i].refreshing_counter > self.middle.refreshing_gap:
-                self.Refresh_learining_vector(i)
             self.Update_middle_particle_velicity(self.middle.particles[i])
             self.CheckVelocityLimits(self.middle.particles[i])
             
-    def Update_lower_particles_velicity(self):
+    def Update_lower_particles_velicity(self) -> None:
         for i in range(self.lower.pop_size):   
             self.Find_local_best(i)
             self.Update_lower_particle_velicity(self.lower.particles[i]) 
             self.CheckVelocityLimits(self.lower.particles[i])
                            
-    def Update_upper_particle_velicity(self, particle):
-        #print()
-        #print('upper speed before: ' + 
-        #     str(particle.best_position[0] - particle.position[0]) + "  " +
-        #     str(self.global_best_position[0] - particle.position[0]))
-               
-        for dim in range(self.num_var):  
-                
+    def Update_upper_particle_velicity(self, particle: Particle) -> None:          
+        for dim in range(self.num_var):           
                 particle.velocity[dim] = self.upper.w * particle.velocity[dim] \
                     + self.upper.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.upper.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
-        #print('upper speed after: ' + str(particle.velocity[0]))         
-                    
-                    
-    def Update_middle_particle_velicity(self, particle):
+              
+    def Update_middle_particle_velicity(self, particle: Particle) -> None:
         for dim in range(self.num_var):            
                 particle.velocity[dim] = self.middle.w * particle.velocity[dim] \
                     + self.middle.c1 * np.random.random() * \
                             (self.lower.particles[particle.learining_vector[dim]].best_position[dim] - particle.position[dim])\
                     + self.middle.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
     
-    def Update_lower_particle_velicity(self, particle):
+    def Update_lower_particle_velicity(self, particle: Particle) -> None:
         for dim in range(self.num_var):            
                 particle.velocity[dim] = self.lower.w * particle.velocity[dim] \
                     + self.lower.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.lower.c2 * np.random.random() * (self.lower.lbest_position[dim] - particle.position[dim]) 
       
-    def CheckVelocityLimits(self,particle):
+    def CheckVelocityLimits(self,particle: Particle) -> None:
         for dim in range(self.num_var): 
             if particle.velocity[dim] < self.velocity_bot_limit:
                 #print(particle.velocity[dim], "   ", self.velocity_bot_limit)
@@ -231,7 +208,7 @@ class PSO:
                 
         
         
-    def Update_particle_best_and_global_best_position(self, particle):
+    def Update_particle_best_and_global_best_position(self, particle: Particle) -> None:
         if(particle.value < particle.best_value):
             particle.best_position = particle.position.copy()
             particle.best_value = particle.value
@@ -242,7 +219,7 @@ class PSO:
         else:
             particle.refreshing_counter += 1
             
-    def Find_local_best(self, idx): 
+    def Find_local_best(self, idx: int) -> None: 
         self.lower.lbest_value = self.lower.particles[idx].best_value
         self.lower.lbest_position = self.lower.particles[idx].best_position.copy()
         for i in range(1,self.lower.neighborhood_size // 2 +1):
@@ -257,7 +234,7 @@ class PSO:
                 self.lower.lbest_position = self.lower.particles[upper_idx].best_position.copy() 
          
     
-    def Refresh_learining_vector(self, idx): 
+    def Refresh_learining_vector(self, idx: int) -> None: 
         for dim in range(self.num_var):
             one = np.random.randint(0,self.lower.pop_size)                   
             two = np.random.randint(0,self.lower.pop_size)
@@ -271,19 +248,19 @@ class PSO:
                 
         self.middle.particles[idx].refreshing_counter = 0
     
-    def GetOptimum(self):
+    def GetOptimum(self) -> float:
         return self.global_best_value
     
-    def GetBestPosition(self):
+    def GetBestPosition(self) -> float:
         return self.global_best_position
     
-    def AddElementToTree(self, parent, elem_name, text):
+    def AddElementToTree(self, parent, elem_name, text) -> None:
         elementXML = gfg.Element(elem_name) 
         parent.append(elementXML)
         elementXML.text = str(text)
         
     
-    def Create_XML_Tree(self, fun_Name):
+    def Create_XML_Tree(self, fun_Name: str) -> None:
         testXML = gfg.Element('TEST') 
         
         self.AddElementToTree(parent = testXML,elem_name = 'PSO_NAME',text = "Social Classes PSO")
@@ -314,7 +291,7 @@ class PSO:
         
         return testXML
    
-    def ExportResultToXML(self, file_Name, fun_Name):
+    def ExportResultToXML(self, file_Name: str, fun_Name: str) -> None:
         root = gfg.Element('ROOT')   
         testXML = self.Create_XML_Tree(fun_Name)
         root.append(testXML)
@@ -322,7 +299,7 @@ class PSO:
         with open (file_Name+".xml","wb") as file :
             tree.write(file)
             
-    def Plots_before_start(self, plot_gbest,plot_velocity):
+    def Plots_before_start(self, plot_gbest: bool,plot_velocity: bool) -> None:
         if plot_gbest:
             self.global_best_history = []
             self.upper_best_history = []
@@ -335,7 +312,7 @@ class PSO:
             self.middle_velocity_history = []
             self.lower_velocity_history = []
             
-    def Plots_update_history(self, plot_gbest,plot_velocity):
+    def Plots_update_history(self, plot_gbest: bool,plot_velocity: bool) -> None:
         if plot_gbest:
             self.global_best_history.append(self.global_best_value)
             self.upper_best_history.append(sum([p.best_value for p in self.upper.particles])/self.upper.pop_size)
@@ -355,7 +332,7 @@ class PSO:
                 self.lower_velocity_history[-1]*self.lower.pop_size)/
                 (self.upper.pop_size+self.middle.pop_size+self.lower.pop_size))
             
-    def Plots_plot(self, plot_gbest,plot_velocity): 
+    def Plots_plot(self, plot_gbest: bool,plot_velocity: bool) -> None: 
         if plot_gbest:
             plt.plot(self.global_best_history[:],label="global")
             plt.plot(self.upper_best_history[:],label="upper")
@@ -377,17 +354,17 @@ class PSO:
             plt.legend()
             plt.show()
             
-    def Calculate_inertia_weight(self, epoch, epochs, w_max, w_min):
+    def Calculate_inertia_weight(self, epoch, epochs, w_max, w_min) -> None:
         return w_min + (w_max-w_min)*(epochs - epoch)/epochs
 
         
-    def Convergence_generation_before_epochs(self):
+    def Convergence_generation_before_epochs(self) -> None:
         if self.convergence_generation:
             self.c_gen_epochs = int(self.epochs*0.1)
             self.epochs = int(self.epochs*0.9)
     
     
-    def Convergence_generation_after_epochs(self,plot_gbest,plot_velocity):
+    def Convergence_generation_after_epochs(self,plot_gbest: bool,plot_velocity: bool) -> None:
         if self.convergence_generation:
             self.upper.particles+=self.middle.particles+self.lower.particles
             #for particle in self.upper.particles:
@@ -403,8 +380,7 @@ class PSO:
                 self.Plots_update_history(plot_gbest,plot_velocity)
         
 
-
-def test_funcion(x):
+def test_funcion(x: list) -> float:
     return   10*np.power(x[0]-1.,2)\
             +20*np.power(x[1]-2.,2)\
             +30*np.power(x[2]-3.,2)\
@@ -412,77 +388,48 @@ def test_funcion(x):
             +50*np.power(x[4]-5.,2)\
             +60*np.power(x[5]-6.,2)\
 
-def f_1(x): #sphere #(-100,100) #0 #0.01
-    result = 0
-    for d in range(len(x)):
-        result+=np.power(x[d],2)
-    return result
+def main() -> None:
+    #uppper
+    pop_size = 5
+    w = 0.7
+    c1 = 2.0
+    c2 = 1.1
+    upper_params = (pop_size,w,c1,c2)
 
-def f_2(x): #schwafel's p2.22 #(-10,10) #0 #0.01
-    result = 0
-    tmp = 1
-    for d in range(len(x)):
-        result+=abs(x[d])
-        tmp*=abs(x[d]) 
-    result+=tmp
-    return result    
+    #middle
+    pop_size = 5
+    w = 0.5
+    c1 = 1.1
+    c2 = 1.7
+    pc = 0.3
+    refreshing_gap = 9
+
+    middle_params = (pop_size,w,c1,c2,pc,refreshing_gap)
+
+    #lower
+    pop_size = 30
+    w = 0.3
+    c1 = 1.35
+    c2 = 1.6
+    neighborhood_size = 5
+    lower_params = (pop_size,w,c1,c2,neighborhood_size)
+
+    num_var = 10
+    generation_change = 3
+    epochs = 1000 
+
+    w_max = 0.9
+    w_min = 0.3
+    c1 = 0.4
+    c2 = 1.8
+    convergence_generation_params = (w_max,w_min,c1,c2)
+
+    range_of_params = [(-500,500)]*num_var
+
+    pso = PSO(upper_params,middle_params,lower_params,generation_change,num_var,epochs)
+    pso.Start(f_7,range_of_params);
+    pso.Print_result()
     
-def f_3(x): #Quadric #(-100,100) #0 #100
-    result = 0
-    for d in range(len(x)):
-        tmp = 0
-        for j in range(d+1):
-            tmp+=x[j]
-        result+=np.power(tmp,2)
-    return result    
-   
-def f_7(x): #Schwefel #(-500,500) #-12569.5 #-10000
-    result = 0
-    for d in range(len(x)):
-        result-=x[d]*math.sin(math.sqrt(abs(x[d])))    
-    return result
-    
-#uppper
-pop_size = 5
-w = 0.7
-c1 = 2.0
-c2 = 1.1
-upper_params = (pop_size,w,c1,c2)
-
-#middle
-pop_size = 5
-w = 0.5
-c1 = 1.1
-c2 = 1.7
-pc = 0.3
-refreshing_gap = 9
-
-middle_params = (pop_size,w,c1,c2,pc,refreshing_gap)
-
-#lower
-pop_size = 30
-w = 0.3
-c1 = 1.35
-c2 = 1.6
-neighborhood_size = 5
-lower_params = (pop_size,w,c1,c2,neighborhood_size)
-
-num_var = 10
-generation_change = 3
-epochs = 1000 
-
-
-w_max = 0.9
-w_min = 0.3
-c1 = 0.4
-c2 = 1.8
-convergence_generation_params = (w_max,w_min,c1,c2)
-
-range_of_params = [(-500,500)]*num_var
-
-pso = PSO(upper_params,middle_params,lower_params,generation_change,num_var,epochs)
-pso.Start(f_7,range_of_params);
-pso.Print_result()
-     
-        
+if __name__ == "__main__":
+    main()   
         
