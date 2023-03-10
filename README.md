@@ -21,6 +21,16 @@
 ### PSO - other modifications
 - **Comprehensive Learning PSO**
 
+### PSO - authorial variants
+- **Social Classes PSO**
+- **Social Classes PSO with surrogate function**
+
+### Test templates
+- **Particles generator and Particles Import**
+- **PSO Param Tuning**
+- **PSO Self Param Tuning**
+- **PSO Test Variants**
+
 
 If you're unfamiliar with PSO, you can find information here: https://en.wikipedia.org/wiki/Particle_swarm_optimization
 
