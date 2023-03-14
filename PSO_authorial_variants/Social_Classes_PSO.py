@@ -7,6 +7,7 @@ sys.path.append('.')
 from Test_templates.test_functions import *
 
 class Particle:
+     "Represents all information about one partile"
      def __init__(self, position, value, velocity):
         self.position = position
         self.value = value
@@ -57,11 +58,13 @@ class PSO:
           
         
     def Init_particles(self) -> None:
+        "Initialize all groups"
         self.Init_group(self.upper.particles,self.upper.pop_size)
         self.Init_group(self.middle.particles,self.middle.pop_size)
         self.Init_group(self.lower.particles,self.lower.pop_size)
             
     def Init_group(self,particles: list,size: int) -> None:
+        "Initialize given list with particles"
         particles[:] = []
         for i in range(size):
             position = []
@@ -74,6 +77,7 @@ class PSO:
             particles.append(Particle(position, value, velocity, self.num_var))
     
     def Start(self, function, range_of_params: list, plot_gbest: bool = False, plot_velocity: bool  = False) -> None:
+        "Starts algorithm and search for optimum"
         self.function = function
         self.range_of_params = range_of_params
         self.velocity_bot_limit = range_of_params[0][0]/10
@@ -101,6 +105,7 @@ class PSO:
         #self.Print_result()
     
     def Find_starting_global_best(self) -> None:
+        "Search for best value in new particles"
         self.global_best_position = self.upper.particles[0].position.copy()
         self.global_best_value = self.upper.particles[0].value
         for i in range(self.upper.pop_size):
@@ -117,33 +122,36 @@ class PSO:
                 self.global_best_value = self.lower.particles[i].value    
         
     def Update_classes(self) -> None:
+        "Rearange particles in groups based on their value"
         self.lower.particles.sort(key=lambda p: p.value)
         tmp_list = self.upper.particles + self.middle.particles+self.lower.particles[:self.lower.pop_size]
         tmp_list.sort(key=lambda p: p.value)
         self.upper.particles = tmp_list[:self.upper.pop_size]
         self.middle.particles = tmp_list[self.upper.pop_size:self.upper.pop_size+self.middle.pop_size]
         self.lower.particles = tmp_list[self.upper.pop_size+self.middle.pop_size:]
-        for mid in self.middle.particles:
-            mid.refreshing_counter = 0
         
             
     def Print_result(self) -> None:
+        "Show global best value and position"
         print(f"best pisition found: {self.global_best_position}")
         print(f"minimum value : {self.global_best_value}")
     
 
     def Update_particles_position(self) -> None:
+        "Update particles in all groups"
         self.Update_particles_position_in_group(self.upper)
         self.Update_particles_position_in_group(self.middle)
         self.Update_particles_position_in_group(self.lower)
     
     def Update_particles_position_in_group(self, group: LowerClass) -> None:
+        "Update particles in given group"
         for i in range(group.pop_size):        
             self.Update_particle_position(group.particles[i])       
             self.Update_particle_value(group.particles[i])
             self.Update_particle_best_and_global_best_position(group.particles[i])
             
     def Update_particle_position(self, particle: Particle) -> None:
+        "Add particle's velocity to its position"
         for dim in range(self.num_var):
             particle.position[dim] += particle.velocity[dim]
             if(particle.position[dim] < self.range_of_params[dim][0]):
@@ -152,36 +160,43 @@ class PSO:
                 particle.position[dim] = self.range_of_params[dim][1] * 0.9
     
     def Update_particle_value(self, particle: Particle) -> None:
+        "Calculate new value of function for particle's position"
         particle.value = self.function(particle.position) 
         
     def Update_particles_velicity(self) -> None:
+        "Update velocity forparticles in each group"
         self.Update_upper_particles_velicity()
         self.Update_middle_particles_velicity()
         self.Update_lower_particles_velicity()
             
     def Update_upper_particles_velicity(self) -> None:
+        "Update velocity for each particle in upper population"
         for i in range(self.upper.pop_size):           
             self.Update_upper_particle_velicity(self.upper.particles[i])
             self.CheckVelocityLimits(self.upper.particles[i])
     
     def Update_middle_particles_velicity(self) -> None:
+        "Update velocity for each particle in middle population"
         for i in range(self.middle.pop_size):
             self.Update_middle_particle_velicity(self.middle.particles[i])
             self.CheckVelocityLimits(self.middle.particles[i])
             
     def Update_lower_particles_velicity(self) -> None:
+        "Update velocity for each particle in lower population"
         for i in range(self.lower.pop_size):   
             self.Find_local_best(i)
             self.Update_lower_particle_velicity(self.lower.particles[i]) 
             self.CheckVelocityLimits(self.lower.particles[i])
                            
-    def Update_upper_particle_velicity(self, particle: Particle) -> None:          
+    def Update_upper_particle_velicity(self, particle: Particle) -> None: 
+        "Update velocity for given upper particle"         
         for dim in range(self.num_var):           
                 particle.velocity[dim] = self.upper.w * particle.velocity[dim] \
                     + self.upper.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.upper.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
               
     def Update_middle_particle_velicity(self, particle: Particle) -> None:
+        "Update velocity for given middle particle"  
         for dim in range(self.num_var):            
                 particle.velocity[dim] = self.middle.w * particle.velocity[dim] \
                     + self.middle.c1 * np.random.random() * \
@@ -189,12 +204,14 @@ class PSO:
                     + self.middle.c2 * np.random.random() * (self.global_best_position[dim] - particle.position[dim]) 
     
     def Update_lower_particle_velicity(self, particle: Particle) -> None:
+        "Update velocity for given lower particle"  
         for dim in range(self.num_var):            
                 particle.velocity[dim] = self.lower.w * particle.velocity[dim] \
                     + self.lower.c1 * np.random.random() * (particle.best_position[dim] - particle.position[dim]) \
                     + self.lower.c2 * np.random.random() * (self.lower.lbest_position[dim] - particle.position[dim]) 
       
     def CheckVelocityLimits(self,particle: Particle) -> None:
+        "Checks if particle has grater velocity then velocity limit"
         for dim in range(self.num_var): 
             if particle.velocity[dim] < self.velocity_bot_limit:
                 #print(particle.velocity[dim], "   ", self.velocity_bot_limit)
@@ -209,17 +226,16 @@ class PSO:
         
         
     def Update_particle_best_and_global_best_position(self, particle: Particle) -> None:
+        "Update best and global best position"  
         if(particle.value < particle.best_value):
             particle.best_position = particle.position.copy()
             particle.best_value = particle.value
-            particle.refreshing_counter = 0
             if(particle.value < self.global_best_value):
                 self.global_best_position = particle.position.copy()
                 self.global_best_value = particle.value             
-        else:
-            particle.refreshing_counter += 1
             
     def Find_local_best(self, idx: int) -> None: 
+        "Finds local best for given index of particle"
         self.lower.lbest_value = self.lower.particles[idx].best_value
         self.lower.lbest_position = self.lower.particles[idx].best_position.copy()
         for i in range(1,self.lower.neighborhood_size // 2 +1):
@@ -232,35 +248,24 @@ class PSO:
             if self.lower.particles[upper_idx].best_value < self.lower.lbest_value:          
                 self.lower.lbest_value = self.lower.particles[upper_idx].best_value    
                 self.lower.lbest_position = self.lower.particles[upper_idx].best_position.copy() 
-         
-    
-    def Refresh_learining_vector(self, idx: int) -> None: 
-        for dim in range(self.num_var):
-            one = np.random.randint(0,self.lower.pop_size)                   
-            two = np.random.randint(0,self.lower.pop_size)
-            while two == one:
-                two = np.random.randint(0,self.lower.pop_size)
-                
-            if self.lower.particles[one].best_value < self.lower.particles[two].best_value:
-                self.middle.particles[idx].learining_vector[dim] = one
-            else:
-                self.middle.particles[idx].learining_vector[dim] = two
-                
-        self.middle.particles[idx].refreshing_counter = 0
     
     def GetOptimum(self) -> float:
+        "Returns global best"
         return self.global_best_value
     
     def GetBestPosition(self) -> float:
+        "Returns global best"
         return self.global_best_position
     
     def AddElementToTree(self, parent, elem_name, text) -> None:
+        "Adds new element to XML tree"
         elementXML = gfg.Element(elem_name) 
         parent.append(elementXML)
         elementXML.text = str(text)
         
     
     def Create_XML_Tree(self, fun_Name: str) -> None:
+        "Creates new XML tree"
         testXML = gfg.Element('TEST') 
         
         self.AddElementToTree(parent = testXML,elem_name = 'PSO_NAME',text = "Social Classes PSO")
@@ -292,6 +297,7 @@ class PSO:
         return testXML
    
     def ExportResultToXML(self, file_Name: str, fun_Name: str) -> None:
+        "Returns global best"
         root = gfg.Element('ROOT')   
         testXML = self.Create_XML_Tree(fun_Name)
         root.append(testXML)
@@ -300,6 +306,7 @@ class PSO:
             tree.write(file)
             
     def Plots_before_start(self, plot_gbest: bool,plot_velocity: bool) -> None:
+        "Inits plots variables"
         if plot_gbest:
             self.global_best_history = []
             self.upper_best_history = []
@@ -313,6 +320,7 @@ class PSO:
             self.lower_velocity_history = []
             
     def Plots_update_history(self, plot_gbest: bool,plot_velocity: bool) -> None:
+        "Update plots info"
         if plot_gbest:
             self.global_best_history.append(self.global_best_value)
             self.upper_best_history.append(sum([p.best_value for p in self.upper.particles])/self.upper.pop_size)
@@ -333,6 +341,7 @@ class PSO:
                 (self.upper.pop_size+self.middle.pop_size+self.lower.pop_size))
             
     def Plots_plot(self, plot_gbest: bool,plot_velocity: bool) -> None: 
+        "Plots plots"
         if plot_gbest:
             plt.plot(self.global_best_history[:],label="global")
             plt.plot(self.upper_best_history[:],label="upper")
@@ -355,29 +364,8 @@ class PSO:
             plt.show()
             
     def Calculate_inertia_weight(self, epoch, epochs, w_max, w_min) -> None:
+        "Calculate dynamic inertia weight for chosen epoch"
         return w_min + (w_max-w_min)*(epochs - epoch)/epochs
-
-        
-    def Convergence_generation_before_epochs(self) -> None:
-        if self.convergence_generation:
-            self.c_gen_epochs = int(self.epochs*0.1)
-            self.epochs = int(self.epochs*0.9)
-    
-    
-    def Convergence_generation_after_epochs(self,plot_gbest: bool,plot_velocity: bool) -> None:
-        if self.convergence_generation:
-            self.upper.particles+=self.middle.particles+self.lower.particles
-            #for particle in self.upper.particles:
-            #    particle.velocity = [0 for i in range(self.num_var)]
-            
-            self.upper.c1 = self.c_gen_c1
-            self.upper.c2 = self.c_gen_c2   
-            
-            for epoch in range(self.c_gen_epochs):
-                self.upper.w = self.Calculate_inertia_weight(epoch, self.c_gen_epochs, self.c_gen_w_max, self.c_gen_w_min )
-                self.Update_particles_velicity()
-                self.Update_particles_position()         
-                self.Plots_update_history(plot_gbest,plot_velocity)
         
 
 def test_funcion(x: list) -> float:
