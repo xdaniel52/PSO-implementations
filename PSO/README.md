@@ -1,6 +1,6 @@
 # PSO - the most basic version of PSO
 
-### Informations:
+### Information:
 - inertia weight - constant
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
