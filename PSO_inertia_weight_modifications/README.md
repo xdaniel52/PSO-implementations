@@ -2,7 +2,7 @@
 
 ## PSO - random inertia weight
 
-### Informations:
+### Information:
 - inertia weight - random
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
@@ -16,7 +16,7 @@
  
 ## PSO - linear decreasing inertia weight
 
-### Informations:
+### Information:
 - inertia weight - linear decreasing
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
