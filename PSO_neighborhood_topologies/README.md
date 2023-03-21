@@ -2,7 +2,7 @@
 
 ## Ring topology
 
-### Informations:
+### Information:
 - inertia weight - constant
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
@@ -17,7 +17,7 @@
  
 ## Von Neumann topology
 
-### Informations:
+### Information:
 - inertia weight - constant
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
@@ -31,7 +31,7 @@
  
  ## Dynamic topology
 
-### Informations:
+### Information:
 - inertia weight - linear decreasing
 - c1 acceleration coefficient - constant
 - c2 acceleration coefficient - constant
@@ -40,6 +40,6 @@
 - the initiated velocity is based on the initiated position
  
 ### Research papers:
- - **Particle swarm optimiser with neighbourhood operator** P. N. Suganthan, 1999
+ - **Particle swarm optimizer with neighbourhood operator** P. N. Suganthan, 1999
  - **A dynamic neighborhood learning based particle swarm optimizer for global numerical optimization** M. Nasir, S. Das, D. Maity, S. Sengupta, U. Halder, and P. N.Suganthan, 2012
  
