@@ -2,11 +2,11 @@
 
 ## Comprehensive Learning PSO
 
-### Informations:
+### Information:
 - inertia weight - linear decreasing
 - c1 acceleration coefficient - constant
 - topology - dynamic
-- using personal using other particles or self best position
+- using personal using other particles or self-best position
 - the initiated velocity is based on the initiated position
 
 ### Research papers:
