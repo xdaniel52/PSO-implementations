@@ -2,7 +2,7 @@
 
 ## PSO - time linear coefficients
 
-### Informations:
+### Information:
 - inertia weight - constant
 - c1 acceleration coefficient - linear (decreasing) 
 - c2 acceleration coefficient - linear (increasing)
